@@ -1,0 +1,21 @@
+- name: Download Burp Suite installer
+  get_url:
+    url: "https://portswigger.net/burp/releases/download?product=community&version=2024.1.1&type=Linux"
+    dest: "/tmp/burpsuite.sh"
+    mode: '0755'
+
+- name: Install Burp Suite
+  command: "/tmp/burpsuite.sh -q"
+  args:
+    creates: "/opt/BurpSuiteCommunity/BurpSuiteCommunity"
+
+# - name: Create a desktop entry for Burp Suite
+#   copy:
+#     dest: "/usr/share/applications/burpsuite.desktop"
+#     content: |
+#       [Desktop Entry]
+#       Name=Burp Suite Community
+#       Exec=/opt/BurpSuiteCommunity/BurpSuiteCommunity
+#       Type=Application
+#       Categories=Development;
+#     mode: '0644'

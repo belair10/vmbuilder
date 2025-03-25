@@ -52,6 +52,12 @@
       - curl
       - gh
       - nmap
+      - ruby-rubygems
+      - ruby-dev
+      - default-jdk
+      - sqlmap
+      - gobuster
+      - ffuf
     state: latest
   become: true
   become_method: sudo
