@@ -9,6 +9,11 @@
   command: tar -C /usr/local -xzf go1.24.1.linux-amd64.tar.gz
   become: true
 
+- name: Change ownership of /usr/local/go
+  file:
+    owner: "{{ ansible_user_id }}"
+  become: true
+
 - name: Delete downloaded tar file
   shell: rm -rf go1.24.1.linux-amd64.tar.gz*
 
