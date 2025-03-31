@@ -52,6 +52,7 @@
       - curl
       - gh
       - nmap
+      - build-essential
       - ruby-rubygems
       - ruby-dev
       - default-jdk

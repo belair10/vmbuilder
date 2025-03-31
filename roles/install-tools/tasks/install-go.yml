@@ -12,12 +12,9 @@
 - name: Delete downloaded tar file
   shell: rm -rf go1.24.1.linux-amd64.tar.gz*
 
-- name: Add go binary path to ~/.profile
-  lineinfile:
-    path: ~/.profile
-    line: 'export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin'
-    create: true
-    state: present
-
-- name: Source updated profile
-  shell: . ~/.profile
+- name: Add go symlink to /usr/local/bin
+  ansible.builtin.file:
+    path: /usr/local/bin/go
+    src: /usr/local/go/bin/go
+    state: link
+  become: true

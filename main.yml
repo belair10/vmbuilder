@@ -1,7 +1,7 @@
 ---
 - name: "Customizing Parrot"
-  hosts: localhost
-  connection: local
+  hosts: ubuntu01
+  # connection: local
   roles:
     - role: "roles/install-tools"
     - role: "roles/configure-tmux"

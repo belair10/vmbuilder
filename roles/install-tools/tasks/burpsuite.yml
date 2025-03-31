@@ -1,13 +1,28 @@
 - name: Download Burp Suite installer
-  get_url:
+  ansible.builtin.get_url:
     url: "https://portswigger.net/burp/releases/download?product=community&version=2024.1.1&type=Linux"
     dest: "/tmp/burpsuite.sh"
     mode: '0755'
 
+- name: Remove Previous Burpsuite Installations
+  ansible.builtin.file:
+    state: absent
+    path: /opt/BurpSuiteCommunity
+  become: true
+
 - name: Install Burp Suite
-  command: "/tmp/burpsuite.sh -q"
-  args:
-    creates: "/opt/BurpSuiteCommunity/BurpSuiteCommunity"
+  ansible.builtin.command: "/tmp/burpsuite.sh -q"
+
+- name: Move Burp Directory
+  ansible.builtin.command: "mv {{ ansible_env.HOME }}/BurpSuiteCommunity/ /opt/"
+  become: true
+
+- name: Create Burpsuite Symlink
+  ansible.builtin.file:
+    state: link
+    path: /usr/local/bin/burpsuite
+    src: /opt/BurpSuiteCommunity/BurpSuiteCommunity
+  become: true
 
 # - name: Create a desktop entry for Burp Suite
 #   copy:
