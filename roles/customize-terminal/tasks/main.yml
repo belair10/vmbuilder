@@ -1,8 +1,8 @@
 ---
 - name: "Copy BashRC"
   copy:
-    src: "{{ role_path }}/files/.bashrc"
-    dest: "{{ ansible_env.HOME }}"
+    src: "{{ role_path }}/files/.bashrc2"
+    dest: "{{ ansible_env.HOME }}/.bashrc"
 
 - name: "Ensure .bash_profile sources .bashrc inside tmux"
   lineinfile:

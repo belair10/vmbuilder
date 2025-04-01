@@ -1,6 +1,6 @@
 ---
 - name: "Customizing Parrot"
-  hosts: ubuntu01
+  hosts: localhost
   # connection: local
   roles:
     - role: "roles/customize-terminal"
