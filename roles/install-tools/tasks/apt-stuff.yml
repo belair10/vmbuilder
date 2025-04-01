@@ -59,6 +59,9 @@
       - sqlmap
       - gobuster
       - ffuf
+      - sqlite3
+      - vim
+      - mariadb-client-core
     state: latest
   become: true
   become_method: sudo
