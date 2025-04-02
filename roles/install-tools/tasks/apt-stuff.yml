@@ -62,6 +62,8 @@
       - sqlite3
       - vim
       - mariadb-client-core
+      - snmp
+      - hydra
     state: latest
   become: true
   become_method: sudo

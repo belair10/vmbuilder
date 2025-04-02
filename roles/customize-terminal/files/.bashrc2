@@ -118,3 +118,5 @@ fi
 
 # make autocompletion ignore case
 bind 'set completion-ignore-case on'
+
+export PATH=$PATH:/home/anton/.local/bin:/home/anton/go/bin

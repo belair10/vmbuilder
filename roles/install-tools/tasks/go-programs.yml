@@ -1,0 +1,6 @@
+---
+- name: "install Kerbrute"
+  shell: go install github.com/ropnop/kerbrute@master
+
+- name: "install pspy"
+  shell: go install github.com/dominicbreuker/pspy@latest
