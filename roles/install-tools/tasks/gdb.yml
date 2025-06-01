@@ -1,0 +1,7 @@
+- name: Ensure gdb is installed
+  ansible.builtin.apt:
+    name: gdb
+    state: present
+
+- name: Install GEF extension
+  ansible.builtin.command: bash -c "$(curl -fsSL https://gef.blah.cat/sh)"

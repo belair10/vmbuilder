@@ -64,6 +64,7 @@
       - mariadb-client-core
       - snmp
       - hydra
+      - gdb
     state: latest
   become: true
   become_method: sudo
