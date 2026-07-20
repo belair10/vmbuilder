@@ -87,10 +87,20 @@
   become: true
   become_method: sudo
   
-- name: "Restart auditd"
+- name: "Restart auditd (Debian)"
   service:
     name: auditd
     state: restarted
   become: true
   become_method: sudo
+  when: ansible_facts['os_family'] == "Debian"
+
+# On RHEL/Fedora auditd.service sets RefuseManualStop=yes, so systemctl (and the
+# service module's stop->start) is refused. The audit package provides a legacy
+# action invoked via `service auditd restart` for exactly this case.
+- name: "Restart auditd (RedHat)"
+  ansible.builtin.command: service auditd restart
+  become: true
+  become_method: sudo
+  when: ansible_facts['os_family'] == "RedHat"
 
