@@ -1,7 +1,21 @@
 - name: Ensure gdb is installed
-  ansible.builtin.apt:
+  ansible.builtin.package:
     name: gdb
     state: present
+  become: true
+  become_method: sudo
 
-- name: Install GEF extension
-  ansible.builtin.command: bash -c "$(curl -fsSL https://gef.blah.cat/sh)"
+# GEF's one-liner (bash -c "$(curl .../sh)") is fragile and pipes a remote
+# script straight into a shell. Use GEF's documented manual install instead.
+- name: Download GEF script
+  ansible.builtin.get_url:
+    url: https://gef.blah.cat/py
+    dest: "{{ ansible_facts['env'].HOME }}/.gdbinit-gef.py"
+    mode: '0644'
+
+- name: Source GEF from .gdbinit
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_facts['env'].HOME }}/.gdbinit"
+    line: "source ~/.gdbinit-gef.py"
+    create: yes
+    mode: '0644'

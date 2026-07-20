@@ -1,0 +1,5 @@
+---
+# Debian/Parrot system trust store
+ca_anchor_dir: /usr/local/share/ca-certificates
+ca_update_cmd: update-ca-certificates
+burp_ca_cert: "{{ ca_anchor_dir }}/BurpSuiteCA.der"

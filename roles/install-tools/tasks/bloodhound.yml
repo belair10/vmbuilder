@@ -3,47 +3,64 @@
   file:
     path: "{{ item }}"
     state: directory
-    mode: '0744'
-  become: true  
+    mode: '0755'
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
+  become: true
   loop:
     - "/opt/bloodhound"
     - "/opt/bloodhound/server"
+    - "/opt/bloodhound/ingest"
 
-- name: "Download composer file"
-  get_url:
-    url: "https://ghst.ly/getbhce"
-    dest: "/opt/bloodhound/server/docker-compose.yaml"
+# Upload compose file instead of downloading it (expects
+# roles/install-tools/files/docker-compose.yaml with port 8088)
+- name: Copy docker compose file
+  ansible.builtin.copy:
+    src: docker-compose.yaml
+    dest: /opt/bloodhound/server/
   become: true
 
-- name: "Change bloodhound port away from 8080"
-  replace:    
-    path: "/opt/bloodhound/server/docker-compose.yaml"    
-    regexp: 'BLOODHOUND_PORT:-8080'
-    replace: 'BLOODHOUND_PORT:-8088'
-  become: true
-
-- name: "Download BloodHound"
+- name: Download BloodHound docker images
   community.docker.docker_compose_v2:
     project_src: "/opt/bloodhound/server"
     state: present
   become: true
 
-- name: "Wait for bloodhound to be up"
-  wait_for:
+- name: Wait for Bloodhound to be up
+  ansible.builtin.wait_for:
     host: "localhost"
     port: 7474
     delay: 10
     timeout: 300
-  become: true
 
-# There probably is a better way to do this...
-- name: "Grab Bloodhound Password"
-  shell: 'cd /opt/bloodhound/server; docker compose logs bloodhound | grep -oP "Password Set To:\s+\K[\S]+"'
-  register: bloodhound_password
-  become: true
+# wait_for on port 8088 only confirms docker-proxy bound the port; the app
+# behind it resets connections until first-boot DB migrations finish (60-120s).
+# Poll the public /api/version endpoint until it actually serves HTTP.
+- name: Wait for the BloodHound API to be serving
+  ansible.builtin.uri:
+    url: "http://localhost:8088/api/version"
+    method: GET
+    status_code: 200
+  register: bh_ready
+  until: bh_ready.status == 200
+  retries: 60
+  delay: 5
 
-- name: "Create file with bloodhound password"
-  copy:
-    content: "username: admin\npassword: {{ bloodhound_password.stdout }}"
-    dest: "/opt/bloodhound/server/initial-password.txt"
-  become: true
+- name: Check if admin password is valid
+  ansible.builtin.uri:
+    url: "http://localhost:8088/api/v2/login"
+    method: POST
+    headers:
+      Content-Type: application/json
+    body_format: json
+    body:
+      login_method: "secret"
+      username: "admin"
+      secret: "{{ bloodhound_admin_password }}"
+    status_code:
+      - 200
+      - 401
+  register: res
+
+- ansible.builtin.include_tasks: enable-admin.yml
+  when: res.status == 401

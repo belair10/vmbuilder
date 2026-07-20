@@ -1,0 +1,62 @@
+---
+# Fedora's firewalld drops the host<->container-bridge forwarding that Docker's
+# published ports rely on. Symptoms: "connection reset" on localhost and
+# timeouts from other hosts. Enabling masquerade lets firewalld permit the
+# forwarded/NAT traffic; we also open the BloodHound UI port. A
+# `firewall-cmd --reload` flushes Docker's own iptables chains, so Docker is
+# restarted afterwards to re-apply them.
+#
+# firewalld is not present on every Fedora install (e.g. WSL2 rootfs), so this
+# whole role is skipped when firewall-cmd is missing.
+
+- name: "Detect firewalld"
+  ansible.builtin.command: command -v firewall-cmd
+  register: firewalld_check
+  failed_when: false
+  changed_when: false
+
+- name: "Skip firewalld configuration (not installed)"
+  ansible.builtin.debug:
+    msg: "firewall-cmd not found; skipping Docker firewalld configuration."
+  when: firewalld_check.rc != 0
+
+- name: "Configure firewalld for Docker published ports"
+  when: firewalld_check.rc == 0
+  become: true
+  block:
+    - name: "Ensure firewalld is running"
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: "Check masquerade state"
+      ansible.builtin.command: firewall-cmd --query-masquerade
+      register: fw_masq
+      failed_when: false
+      changed_when: false
+
+    - name: "Enable masquerade for Docker networking"
+      ansible.builtin.command: firewall-cmd --permanent --add-masquerade
+      when: "'yes' not in fw_masq.stdout"
+
+    - name: "Check BloodHound port state"
+      ansible.builtin.command: firewall-cmd --query-port=8088/tcp
+      register: fw_port
+      failed_when: false
+      changed_when: false
+
+    - name: "Open BloodHound UI port (8088/tcp)"
+      ansible.builtin.command: firewall-cmd --permanent --add-port=8088/tcp
+      when: "'yes' not in fw_port.stdout"
+
+    - name: "Reload firewalld and restart Docker to re-apply its rules"
+      when: ('yes' not in fw_masq.stdout) or ('yes' not in fw_port.stdout)
+      block:
+        - name: "Reload firewalld"
+          ansible.builtin.command: firewall-cmd --reload
+
+        - name: "Restart Docker"
+          ansible.builtin.service:
+            name: docker
+            state: restarted

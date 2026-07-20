@@ -1,0 +1,6 @@
+---
+# Fedora/RedHat system trust store: anchors placed here and activated with
+# `update-ca-trust` are trusted by system CLI tools (curl, etc.).
+ca_anchor_dir: /etc/pki/ca-trust/source/anchors
+ca_update_cmd: update-ca-trust
+burp_ca_cert: "{{ ca_anchor_dir }}/BurpSuiteCA.der"

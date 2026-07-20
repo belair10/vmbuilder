@@ -10,8 +10,16 @@
     - role: "roles/configure-logging"
     - role: "roles/configure-system"
     - role: gantsign.visual-studio-code
+      # VS Code Linux cannot run under WSL (its `code` CLI refuses and prompts
+      # to install the Windows build instead), so skip the whole role on WSL.
+      # Runs normally on bare-metal / VM Fedora.
+      when: "'microsoft' not in (ansible_facts['kernel'] | lower)"
+      # Fedora 41+ reports ansible_pkg_mgr as "dnf5"; this role only handles
+      # "dnf" (install-dnf.yml). Remap dnf5 -> dnf for the role scope, leaving
+      # apt untouched on Debian/Parrot.
+      ansible_pkg_mgr: "{{ 'dnf' if ansible_facts['pkg_mgr'] == 'dnf5' else ansible_facts['pkg_mgr'] }}"
       users:
-        - username: "{{ ansible_user_id }}" 
+        - username: "{{ ansible_facts['user_id'] }}"
           visual_studio_code_extensions:
             - streetsidesoftware.code-spell-checker
             - ms-python.python

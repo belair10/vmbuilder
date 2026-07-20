@@ -1,6 +1,6 @@
 ---
 - name: "Install Tmux"
-  apt:
+  package:
     name: tmux
     state: present
   become: true
@@ -8,6 +8,6 @@
 - name: "Copying Tmux Config"
   copy:
     src: "{{ role_path }}/files/.tmux.conf"
-    dest: "{{ ansible_env.HOME }}"
+    dest: "{{ ansible_facts['env'].HOME }}"
 
 

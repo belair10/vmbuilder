@@ -1,0 +1,15 @@
+---
+- name: "Ensure dnf-plugins-core is present"
+  package:
+    name: dnf-plugins-core
+    state: present
+  become: true
+  become_method: sudo
+
+- name: "Add Docker CE repository"
+  get_url:
+    url: "{{ docker_fedora_repo_url }}"
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: '0644'
+  become: true
+  become_method: sudo

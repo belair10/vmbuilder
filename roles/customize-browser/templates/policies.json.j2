@@ -1,7 +1,7 @@
 {
   "policies": {
     "Certificates": {
-      "Install": ["/usr/local/share/ca-certificates/BurpSuiteCA.der"]
+      "Install": ["{{ burp_ca_cert }}"]
     },
     "DisableAppUpdate": true,
     "DisplayBookmarksToolbar": true,

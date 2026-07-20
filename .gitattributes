@@ -1,0 +1,15 @@
+# This repository is deployed to Linux hosts. Keep LF line endings in the
+# working tree regardless of the OS git runs on, so shebang scripts and
+# sourced/parsed config files don't break with CRLF (\r) terminators.
+* text=auto eol=lf
+
+# Belt-and-suspenders for the files that fail hardest with CRLF
+*.sh       text eol=lf
+*.py       text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.conf     text eol=lf
+*.toml     text eol=lf
+*.rules    text eol=lf
+.bashrc*   text eol=lf
+.tmux.conf text eol=lf

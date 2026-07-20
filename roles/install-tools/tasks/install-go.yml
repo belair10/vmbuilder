@@ -1,22 +1,32 @@
 - name: Download go tar file
-  command: wget https://go.dev/dl/go1.24.1.linux-amd64.tar.gz
- 
+  ansible.builtin.get_url:
+    url: https://go.dev/dl/go1.24.1.linux-amd64.tar.gz
+    dest: /tmp/go1.24.1.linux-amd64.tar.gz
+    mode: '0644'
+
 - name: Delete previous installation
-  command: rm -rf /usr/local/go
+  ansible.builtin.file:
+    path: /usr/local/go
+    state: absent
   become: true
 
 - name: Extract and move new go folder to /usr/local
-  command: tar -C /usr/local -xzf go1.24.1.linux-amd64.tar.gz
+  ansible.builtin.unarchive:
+    src: /tmp/go1.24.1.linux-amd64.tar.gz
+    dest: /usr/local
+    remote_src: yes
   become: true
 
 - name: Change ownership of /usr/local/go
   file:
-    owner: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
     path: /usr/local/go/bin
   become: true
 
 - name: Delete downloaded tar file
-  shell: rm -rf go1.24.1.linux-amd64.tar.gz*
+  ansible.builtin.file:
+    path: /tmp/go1.24.1.linux-amd64.tar.gz
+    state: absent
 
 - name: Add go symlink to /usr/local/bin
   ansible.builtin.file:

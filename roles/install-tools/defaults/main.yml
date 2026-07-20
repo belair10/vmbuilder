@@ -1,3 +1,12 @@
 ---
-# defaults file for configure-logging
+# defaults file for install-tools
+
+# Debian/Parrot codename used to build the Docker apt repository line
 distribution: "bookworm"
+
+# Fedora repofile for Docker CE
+docker_fedora_repo_url: "https://download.docker.com/linux/fedora/docker-ce.repo"
+
+# BloodHound CE admin password the playbook sets after first-boot.
+# CHANGE THIS (or override with -e bloodhound_admin_password=...).
+bloodhound_admin_password: "Toortoor1337"

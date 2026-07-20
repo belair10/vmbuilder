@@ -1,0 +1,61 @@
+---
+# Debian/Parrot package names and repo settings for install-tools
+
+# Packages to remove before installing the official Docker packages
+packages_to_remove:
+  - docker.io
+  - docker-compose
+  - docker-doc
+  - podman-docker
+
+# Extra packages pulled in by the distro Docker packages that we also purge
+docker_transitional_packages:
+  - containerd
+  - runc
+
+# System packages (names as they appear in Debian/Parrot repos)
+system_packages:
+  - jq
+  - pipx
+  - flameshot
+  - exiftool
+  - rsyslog
+  - ca-certificates
+  - curl
+  - wget
+  - git
+  - unzip
+  - tar
+  - python3-pip
+  - gh
+  - nmap
+  - build-essential
+  # Build deps for the pipx AD tools (impacket/NetExec/certipy build native
+  # extensions needing python headers, Rust, and crypto/kerberos headers)
+  - python3-dev
+  - cargo
+  - rustc
+  - libffi-dev
+  - libssl-dev
+  - libkrb5-dev
+  - ruby-rubygems
+  - ruby-dev
+  - default-jdk
+  - sqlite3
+  - vim
+  - mariadb-client-core
+  - snmp
+  - hydra
+  - gdb
+  - tcpdump
+  - tshark
+  - dnsutils
+  - whois
+
+# Official Docker CE packages
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin

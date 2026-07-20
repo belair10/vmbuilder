@@ -1,0 +1,60 @@
+---
+# Fedora/RedHat package names and repo settings for install-tools
+
+# Podman ships as the default container stack on Fedora; remove the docker
+# shim so the official Docker CE packages can take over.
+packages_to_remove:
+  - podman-docker
+
+# No separate transitional packages to purge on Fedora
+docker_transitional_packages: []
+
+# System packages (names as they appear in Fedora repos).
+# - gobuster/ffuf are installed via `go install` (see go-programs.yml)
+# - sqlmap is installed from git (see github-repos.yml)
+# because neither is packaged in the Fedora base repos. wget is intentionally
+# omitted: Fedora ships wget2, which already provides /usr/bin/wget.
+system_packages:
+  - jq
+  - pipx
+  - flameshot
+  - perl-Image-ExifTool
+  - rsyslog
+  - ca-certificates
+  - curl
+  - git
+  - unzip
+  - tar
+  - python3-pip
+  - gh
+  - nmap
+  - "@development-tools"
+  # Build deps for the pipx AD tools (impacket/NetExec/certipy build native
+  # extensions needing python headers, Rust, and crypto/kerberos headers)
+  - python3-devel
+  - cargo
+  - rust
+  - libffi-devel
+  - openssl-devel
+  - krb5-devel
+  - rubygems
+  - ruby-devel
+  - java-latest-openjdk-devel
+  - sqlite
+  - vim-enhanced
+  - mariadb
+  - net-snmp-utils
+  - hydra
+  - gdb
+  - tcpdump
+  - wireshark-cli
+  - bind-utils
+  - whois
+
+# Official Docker CE packages (same names as Debian)
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin

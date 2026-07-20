@@ -1,0 +1,94 @@
+---
+- name: "Load distro-specific package names"
+  include_vars: "{{ ansible_facts['os_family'] }}.yml"
+
+- name: "Update package cache (Debian)"
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+  become: true
+  become_method: sudo
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: "Upgrade all packages (Debian)"
+  apt:
+    upgrade: yes
+    force_apt_get: yes
+  become: true
+  become_method: sudo
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: "Upgrade all packages (RedHat)"
+  dnf:
+    name: "*"
+    state: latest
+    update_cache: yes
+  become: true
+  become_method: sudo
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: "Remove distro-provided container packages"
+  package:
+    name: "{{ packages_to_remove }}"
+    state: absent
+  register: docker_remove
+  become: true
+  become_method: sudo
+
+- name: "Remove NetExec - We want to use pipx for this"
+  package:
+    name: netexec
+    state: absent
+  become: true
+  become_method: sudo
+
+- name: "Remove transitional container packages"
+  package:
+    name: "{{ docker_transitional_packages }}"
+    state: absent
+  when:
+    - docker_transitional_packages | length > 0
+    - docker_remove.changed
+  become: true
+  become_method: sudo
+
+- name: "Installing Packages"
+  package:
+    name: "{{ system_packages }}"
+    state: latest
+  become: true
+  become_method: sudo
+
+- name: "Configure Docker repository"
+  include_tasks: "docker-{{ ansible_facts['os_family'] }}.yml"
+
+- name: "Install Docker"
+  package:
+    name: "{{ docker_packages }}"
+    state: latest
+  become: true
+  become_method: sudo
+
+# Debian/Parrot auto-start the daemon on install; Fedora leaves it disabled.
+- name: "Enable and start Docker"
+  service:
+    name: docker
+    enabled: yes
+    state: started
+  become: true
+  become_method: sudo
+
+- name: "Add current user to the docker group"
+  user:
+    name: "{{ ansible_facts['user_id'] }}"
+    groups: docker
+    append: yes
+  become: true
+  become_method: sudo
+  when: ansible_facts['user_id'] != 'root'
+
+# Fedora ships firewalld, which breaks Docker published-port reachability.
+- name: "Configure firewalld for Docker published ports"
+  include_tasks: docker-firewalld.yml
+  when: ansible_facts['os_family'] == "RedHat"

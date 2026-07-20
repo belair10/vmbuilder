@@ -1,7 +1,10 @@
+- name: "Load distro-specific package names"
+  include_vars: "{{ ansible_facts['os_family'] }}.yml"
+
 - name: "Install Packages"
   package:
-    name: "auditd"
-    state: present  
+    name: "{{ audit_package }}"
+    state: present
   become: true
   become_method: sudo
 

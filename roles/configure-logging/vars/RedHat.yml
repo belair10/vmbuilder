@@ -1,0 +1,3 @@
+---
+# vars file for configure-logging (Fedora/RedHat)
+audit_package: audit

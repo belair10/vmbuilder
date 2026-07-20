@@ -6,6 +6,15 @@
   loop:
     - { repo: "https://github.com/Flangvik/SharpCollection", location: "/opt/SharpCollection" }
     - { repo: "https://github.com/danielmiessler/SecLists", location: "/opt/SecLists" }
+    - { repo: "https://github.com/sqlmapproject/sqlmap", location: "/opt/sqlmap" }
+  become: true
+  become_method: sudo
+
+- name: "Symlink sqlmap into PATH"
+  ansible.builtin.file:
+    path: /usr/local/bin/sqlmap
+    src: /opt/sqlmap/sqlmap.py
+    state: link
   become: true
   become_method: sudo
 

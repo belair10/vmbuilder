@@ -1,0 +1,15 @@
+---
+- name: "Add Docker keyring to apt"
+  apt_key:
+    url: "https://download.docker.com/linux/debian/gpg"
+    state: present
+  become: true
+  become_method: sudo
+
+- name: "Install Docker Repository"
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ distribution }} stable"
+    state: present
+    update_cache: yes
+  become: true
+  become_method: sudo

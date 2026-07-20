@@ -4,3 +4,9 @@
 
 - name: "install pspy"
   shell: go install github.com/dominicbreuker/pspy@latest
+
+- name: "install gobuster"
+  shell: go install github.com/OJ/gobuster/v3@latest
+
+- name: "install ffuf"
+  shell: go install github.com/ffuf/ffuf/v2@latest

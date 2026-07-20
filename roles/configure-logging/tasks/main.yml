@@ -1,3 +1,23 @@
 ---
+# The WSL2 kernel has no audit subsystem, so auditd/laurel cannot run there.
+# Detect it so we can skip the audit pipeline on WSL while keeping it on real
+# hardware/VMs.
+- name: "Detect WSL kernel"
+  ansible.builtin.set_fact:
+    is_wsl: "{{ 'microsoft' in (ansible_facts['kernel'] | lower) }}"
+
+# Firewall/SYN logging relies on ufw, which is Debian/Parrot specific.
+# Fedora ships firewalld; skip firewall logging there.
 - include_tasks: "ufw.yml"
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: "Skip auditd + laurel on WSL"
+  ansible.builtin.debug:
+    msg: >-
+      WSL kernel detected ({{ ansible_facts['kernel'] }}); skipping auditd +
+      laurel because the WSL kernel provides no audit subsystem. This runs
+      normally on bare-metal / VM Fedora.
+  when: is_wsl
+
 - include_tasks: "auditd.yml"
+  when: not is_wsl
