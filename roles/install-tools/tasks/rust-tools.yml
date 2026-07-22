@@ -1,0 +1,13 @@
+---
+# rusthound-ce (a BloodHound CE collector) is built from its GitHub repo. cargo/rust
+# come from the system packages (see packages.yml); build it here and install into
+# /usr/local so the binary is on PATH for every user. The gssapi crate it depends on
+# builds native bindings needing clang/libclang, pkg-config, and the krb5 headers.
+# The `creates` guard keeps this idempotent; delete the binary (or add --force) to
+# rebuild against the latest repo HEAD.
+- name: "Install rusthound-ce from GitHub"
+  ansible.builtin.command:
+    cmd: cargo install --git https://github.com/g0h4n/RustHound-CE --root /usr/local
+    creates: /usr/local/bin/rusthound-ce
+  become: true
+  become_method: sudo

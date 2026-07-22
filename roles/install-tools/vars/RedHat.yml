@@ -37,6 +37,10 @@ system_packages:
   - libffi-devel
   - openssl-devel
   - krb5-devel
+  # rusthound-ce's gssapi crate builds native bindings (clang/libclang + pkg-config)
+  - clang
+  - clang-devel
+  - pkgconf-pkg-config
   - rubygems
   - ruby-devel
   - java-latest-openjdk-devel
